@@ -1,6 +1,6 @@
 package com.tdt.demo.servlet;
 
-import com.tdt.demo.application.UserAllowedManager;
+import com.tdt.client.UserAllowedManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

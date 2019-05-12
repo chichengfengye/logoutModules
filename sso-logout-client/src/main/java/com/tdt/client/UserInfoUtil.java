@@ -1,10 +1,10 @@
-package com.tdt.demo.util;
+package com.tdt.client;
 
-import com.tdt.demo.application.UserInfo;
+import com.tdt.client.UserInfo;
 
 public class UserInfoUtil {
-    public static String generatePubMsg(String cookie, String username) {
-        return cookie + ":" + username;
+    public static String getUserLoginMsg(String cookie, String username) {
+        return "+" + cookie + ":" + username;
     }
 
     public static UserInfo getUserInfoFromMessage(String subMsg) {

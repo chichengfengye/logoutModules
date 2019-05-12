@@ -1,4 +1,4 @@
-package com.tdt.demo.application;
+package com.tdt.client;
 
 import java.io.Serializable;
 

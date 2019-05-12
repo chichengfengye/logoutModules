@@ -1,5 +1,6 @@
 package com.tdt.demo.server;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -12,6 +13,12 @@ import java.util.UUID;
 
 @WebServlet(name = "getCASToken", urlPatterns = "/casLogin")
 public class CASLogin extends HttpServlet {
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        System.out.println("casLogin servlet init....");
+        super.init();
+    }
+
     @Override
     public void init() throws ServletException {
 
@@ -34,8 +41,9 @@ public class CASLogin extends HttpServlet {
 
         resp.addCookie(cookie);
 
-        System.out.println(" resp.sendRedirect(\"http://localhost:8081/?ticket=\" + sessionId);");
-        resp.sendRedirect("http://localhost:8081/userLogin?username="+ "jf" +"&pass="+ req.getParameter("passjf") +"&ticket=" + sessionId);
+        System.out.println(" resp.sendRedirect(\"http://localhost:8081/?ticket=\"" + sessionId);
+
+        resp.sendRedirect("http://localhost:8081/userLogin?username="+ req.getParameter("username") +"&pass="+ req.getParameter("pass") +"&ticket=" + sessionId);
 
 //        resp.setContentType("text/html");
 //

@@ -11,6 +11,7 @@
     <modules>
 	    <module>application</module>
 	    <module>server</module>
+        <module>sso-logout-client</module>
     </modules>
     <properties>
         <jetty-version>9.2.9.v20150224</jetty-version>
@@ -18,6 +19,14 @@
         <java.cas.client.version>3.4.1</java.cas.client.version>
     </properties>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.6</version>
+        </dependency>
+
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jsp-api</artifactId>
@@ -106,15 +115,17 @@
             <version>2.9.0</version>
         </dependency>
 
+
+
     </dependencies>
     <build>
         <finalName>app</finalName>
         <plugins>
-            <plugin>
+           <!-- <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
-            </plugin>
+            </plugin>-->
             <!--			<plugin>
                             <groupId>org.eclipse.jetty</groupId>
                             <artifactId>jetty-maven-plugin</artifactId>
@@ -131,14 +142,14 @@
                                 </webApp>
                             </configuration>
                         </plugin>-->
-            <plugin>
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

@@ -1,4 +1,4 @@
-package com.tdt.demo.util;
+package com.tdt.client;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;
@@ -10,7 +10,7 @@ public class HttpUtil {
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length >0) {
             for (Cookie cookie : cookies) {
-                if (cookie.getValue().equals("application-cookie")) {
+                if (cookie.getName().equals("application-cookie")) {
                     return cookie;
                 }
             }

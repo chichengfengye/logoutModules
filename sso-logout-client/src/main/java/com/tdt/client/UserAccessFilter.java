@@ -1,7 +1,4 @@
-package com.tdt.demo.filter;
-
-import com.tdt.demo.application.UserAllowedManager;
-import com.tdt.demo.util.HttpUtil;
+package com.tdt.client;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;

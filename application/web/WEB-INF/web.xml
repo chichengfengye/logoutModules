@@ -5,7 +5,7 @@
          version="4.0">
     <filter>
         <filter-name>UserAccessFilter</filter-name>
-        <filter-class>com.tdt.demo.filter.UserAccessFilter</filter-class>
+        <filter-class>com.tdt.client.UserAccessFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -15,7 +15,7 @@
 
     <filter>
         <filter-name>ClientFilter</filter-name>
-        <filter-class>com.tdt.demo.filter.ClientFilter</filter-class>
+        <filter-class>com.tdt.demo.filter.CASFilter</filter-class>
     </filter>
 
     <filter-mapping>
