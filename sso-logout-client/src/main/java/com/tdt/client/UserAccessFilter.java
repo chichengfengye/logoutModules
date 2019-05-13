@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class UserAccessFilter implements Filter {
-    private UserAllowedManager userAllowedManager;
+    private UserAccessManager userAccessManager;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         // init redis client to sub
-        userAllowedManager = UserAllowedManager.getInstance();
+        userAccessManager = UserAccessManager.getInstance();
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -78,7 +78,7 @@ public class UserAccessFilter implements Filter {
             }
             //有cas cookie
             else {
-                if (UserAllowedManager.getInstance().isAllowedUserByCookie(localCookie.getValue())) {
+                if (UserAccessManager.getInstance().isAllowedUserByCookie(localCookie.getValue())) {
                     System.out.println("在白名单，放行。。。。");
                     goOn(servletRequest, servletResponse, filterChain);
                 } else {
@@ -132,7 +132,7 @@ public class UserAccessFilter implements Filter {
     }
 
     private boolean isUserInWhiteList(String cookie) {
-        return userAllowedManager.isAllowedUserByCookie(cookie);
+        return userAccessManager.isAllowedUserByCookie(cookie);
     }
 
     /**

@@ -39,6 +39,8 @@ public class CASLogin extends HttpServlet {
 
         Cookie cookie = new Cookie("server-cookie",sessionId);
 
+        CookieHolder.addCookie(cookie.getValue(), req.getParameter("username"));
+
         resp.addCookie(cookie);
 
         System.out.println(" resp.sendRedirect(\"http://localhost:8081/?ticket=\"" + sessionId);

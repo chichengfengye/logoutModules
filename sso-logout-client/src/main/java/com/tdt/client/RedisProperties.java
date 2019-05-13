@@ -5,6 +5,7 @@ import redis.clients.jedis.HostAndPort;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 public class RedisProperties {
@@ -24,6 +25,8 @@ public class RedisProperties {
     //            #是否在从池中取出连接前进行检验,如果检验失败,则从池中去除连接并尝试取出另一个
     private boolean testOnBorrow = true;
 
+    private String channelName;
+
     public RedisProperties() {
         properties = new Properties();
     }
@@ -37,7 +40,16 @@ public class RedisProperties {
 
     public void addProperties(String filePath) {
         try {
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(filePath));
+            URL url = this.getClass().getClassLoader().getResource("/" + filePath);
+            String path = url.getPath();
+            if (path != null) {
+                path = path.replace("%20", " ");
+                System.out.println("find redis properties in path : [ "+  url.getPath() +" ]");
+            } else {
+                System.out.println("redis properties not find in path : [ "+  filePath +" ]");
+                return;
+            }
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(path));
             this.properties.load(inputStream);
             System.out.println("load properties[" + filePath + "] success...");
 
@@ -50,8 +62,12 @@ public class RedisProperties {
             this.maxTotal = properties.get("maxTotal") == null ? 15 : Integer.parseInt(properties.getProperty("maxTotal"));
             this.timeout = properties.get("timeout") == null ? 5000 : Integer.parseInt(properties.getProperty("timeout"));
             this.maxWait = properties.get("maxWait") == null ? 1000 : Integer.parseInt(properties.getProperty("maxWait"));
-
-
+            if (properties.get("channelName") == null) {
+                System.out.println("channelName is not provided! you mast provide a channel name for our cas pub/sub!");
+                return;
+            } else {
+                this.channelName = properties.getProperty("channelName");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,5 +105,9 @@ public class RedisProperties {
 
     public boolean isTestOnBorrow() {
         return testOnBorrow;
+    }
+
+    public String getChannelName() {
+        return channelName;
     }
 }

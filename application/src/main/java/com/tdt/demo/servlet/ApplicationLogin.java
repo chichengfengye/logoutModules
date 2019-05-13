@@ -1,6 +1,6 @@
 package com.tdt.demo.servlet;
 
-import com.tdt.client.UserAllowedManager;
+import com.tdt.client.UserAccessManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,7 +37,7 @@ public class ApplicationLogin extends HttpServlet {
             resp.addCookie(cookie);
             resp.setContentType("text/html");
 
-            UserAllowedManager.getInstance().addCookieUserAndPub(sessionId, username);
+            UserAccessManager.getInstance().addCookieUserAndPub(sessionId, username);
 
             PrintWriter printWriter = resp.getWriter();
             printWriter.println("<html> has set application cookie</html>");

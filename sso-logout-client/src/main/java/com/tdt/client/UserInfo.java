@@ -8,7 +8,7 @@ public class UserInfo implements Serializable {
     private String cookie;
     private String username;
     private Long loginTime;
-    private Long ssoLogoutTime;
+    private Long invalidLoginTime;
 
     public UserInfo() {
 
@@ -45,12 +45,12 @@ public class UserInfo implements Serializable {
         this.loginTime = loginTime;
     }
 
-    public Long getSsoLogoutTime() {
-        return ssoLogoutTime;
+    public Long getInvalidLoginTime() {
+        return invalidLoginTime;
     }
 
-    public void setSsoLogoutTime(Long ssoLogoutTime) {
-        this.ssoLogoutTime = ssoLogoutTime;
+    public void setInvalidLoginTime(Long invalidLoginTime) {
+        this.invalidLoginTime = invalidLoginTime;
     }
 
     @Override

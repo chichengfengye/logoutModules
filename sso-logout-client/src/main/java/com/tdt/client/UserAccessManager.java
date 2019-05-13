@@ -1,11 +1,12 @@
 package com.tdt.client;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public class UserAllowedManager {
+public class UserAccessManager {
     private static Object lock = new Object();
-    private static UserAllowedManager userAllowedManager;
+    private static UserAccessManager userAccessManager;
     private PubSubWorker pubSubWorker;
     /**
      * cookieUserNameMap 数据内容:
@@ -21,25 +22,25 @@ public class UserAllowedManager {
      */
     private ConcurrentHashMap<String, CopyOnWriteArraySet<String>> whiteUserList;
 
-    private UserAllowedManager() {
+    private UserAccessManager() {
     }
 
-    /*public static UserAllowedManager initialzerInit() {
-        userAllowedManager = new UserAllowedManager();
-        userAllowedManager.init();
-        return userAllowedManager;
+    /*public static UserAccessManager initialzerInit() {
+        userAccessManager = new UserAccessManager();
+        userAccessManager.init();
+        return userAccessManager;
     }*/
 
-    public static UserAllowedManager getInstance() {
-        if (userAllowedManager == null) {
+    public static UserAccessManager getInstance() {
+        if (userAccessManager == null) {
             synchronized (lock) {
-                if (userAllowedManager == null) {
-                    userAllowedManager = new UserAllowedManager();
-                    userAllowedManager.init();
+                if (userAccessManager == null) {
+                    userAccessManager = new UserAccessManager();
+                    userAccessManager.init();
                 }
             }
         }
-        return userAllowedManager;
+        return userAccessManager;
     }
 
     public void init() {
@@ -58,10 +59,9 @@ public class UserAllowedManager {
     public void addCookieUserAndPub(String cookie, String username) {
         long loginTime = System.currentTimeMillis() / 1000;
         UserInfo userInfo = new UserInfo(cookie, username, loginTime);
-
         addCookieUserNotPub(userInfo);
         System.out.println("begin pub to redis...");
-        pubSubWorker.publish(UserInfoUtil.getUserLoginMsg(cookie, username, loginTime));
+        pubSubWorker.publish(UserInfoUtil.getUserLoginMsg(userInfo));
         System.out.println("pub finished...");
     }
 
@@ -90,14 +90,40 @@ public class UserAllowedManager {
     /**
      * 移除用户从白名单，意思就是他无权访问接口
      *
-     * @param username
      */
-    public void removeFromWhiteList(String username) {
-        System.out.println("remove user[" + username + "] from whiteList...");
-        CopyOnWriteArraySet<String> set = whiteUserList.remove(username);
+    public void removeFromWhiteList(UserInfo userInfo) {
+        long invalidTime = userInfo.getInvalidLoginTime();
+        System.out.println("remove user[" + userInfo.getUsername() + "] from whiteList...");
+        boolean removeUserFromList = true;
+
+        /**
+         * 先獲取該用戶對應的全部cookie已經登陸時間信息，然後依據修改密碼后的時間來
+         * 判斷用戶是否有需要保留的cookie，如果沒有，則刪除用戶的名字，如果有，則保留
+         * 用戶名字和對應的那個一cookie在白名單中。
+         */
+        CopyOnWriteArraySet<String> set = whiteUserList.get(userInfo.getUsername());
         //清除緩存中的無用cookie，這裏衹是爲了釋放緩存，不存在安全問題，安全問題已經藉助whiteUserList完成了
-        for (String s : set) {
-            cookieUserNameMap.remove(s);
+        Iterator iterator = set.iterator();
+        while (iterator.hasNext()) {
+            String s = (String)iterator.next();
+            String username = cookieUserNameMap.get(s);
+            if (username == null) {
+                cookieUserNameMap.remove(s);
+            } else {
+                //刪除在修改狀態之前登陸的cookie
+                long loginTime = Long.parseLong(username.split("loginTime=")[1]);
+                if (invalidTime >= loginTime) {
+                    cookieUserNameMap.remove(s);
+                    set.remove(s);
+                } else {
+                    //保留修改之後登陸的新的cookie
+                    removeUserFromList = false;
+                }
+            }
+        }
+
+        if (removeUserFromList) {
+            whiteUserList.remove(userInfo.getUsername());
         }
     }
 
@@ -112,8 +138,9 @@ public class UserAllowedManager {
         if (username == null) {
             return false;
         }
+        username = username.split("-loginTime=")[0];
 
-        boolean inWhiteList = whiteUserList.contains(username.split("-loginTime=")[1]);
+        boolean inWhiteList = whiteUserList.containsKey(username);
         if (!inWhiteList) {
             cookieUserNameMap.remove(cookie);
         }

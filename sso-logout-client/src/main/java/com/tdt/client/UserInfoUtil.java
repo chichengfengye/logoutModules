@@ -1,25 +1,32 @@
 package com.tdt.client;
 
-import com.tdt.client.UserInfo;
+import com.alibaba.fastjson.JSON;
 
 public class UserInfoUtil {
-    public static String getUserLoginMsg(String cookie, String username, long loginTime) {
-        return "+" + cookie + ":" + username;
+    public static String getUserOutMsg(String username) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUsername(username);
+        userInfo.setInvalidLoginTime(System.currentTimeMillis() / 1000L);
+        return "-" + JSON.toJSONString(userInfo);
     }
 
+    public static String getUserLoginMsg(UserInfo userInfo) {
+        return "+" + JSON.toJSONString(userInfo);
+    }
+
+    /**
+     * msg:
+     * username-cookie-loginTime=11912312312
+     *
+     * @param subMsg
+     * @return
+     */
     public static UserInfo getUserInfoFromMessage(String subMsg) {
         if (subMsg != null) {
-            String[] arr = subMsg.split(":");
-            if (arr.length == 2) {
-                UserInfo userInfo = new UserInfo();
-                userInfo.setCookie(arr[0]);
-                userInfo.setUsername(arr[1]);
-                return userInfo;
-            }
+            return (UserInfo) JSON.parseObject(subMsg, UserInfo.class);
         }
 
         return null;
     }
 
-//    public static UserInfo getUserInfo
 }

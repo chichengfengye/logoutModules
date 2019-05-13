@@ -13,11 +13,13 @@ public class PubSubListener extends JedisPubSub {
         if (message.startsWith("+")) {
             UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
             //添加到 白名单 和 Map<cookie,username>缓存
-            UserAllowedManager.getInstance().addCookieUserNotPub(userInfo.getCookie(), userInfo.getUsername());
+            UserAccessManager.getInstance().addCookieUserNotPub(userInfo);
 
         } else if (message.startsWith("-")) {
-            String username = message.substring(1);
-            UserAllowedManager.getInstance().removeFromWhiteList(username);
+            UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
+            UserAccessManager.getInstance().removeFromWhiteList(userInfo);
+        } else {
+            System.out.println("could not notified message: "+ message);
         }
     }
 
