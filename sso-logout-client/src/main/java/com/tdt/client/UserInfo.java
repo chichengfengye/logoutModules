@@ -7,6 +7,19 @@ public class UserInfo implements Serializable {
 
     private String cookie;
     private String username;
+    private Long loginTime;
+    private Long ssoLogoutTime;
+
+    public UserInfo() {
+
+    }
+
+    public UserInfo(String cookie, String username, long loginTime) {
+        this.cookie = cookie;
+        this.username = username;
+        this.loginTime = loginTime;
+    }
+
 
     public String getCookie() {
         return cookie;
@@ -22,6 +35,22 @@ public class UserInfo implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Long getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(Long loginTime) {
+        this.loginTime = loginTime;
+    }
+
+    public Long getSsoLogoutTime() {
+        return ssoLogoutTime;
+    }
+
+    public void setSsoLogoutTime(Long ssoLogoutTime) {
+        this.ssoLogoutTime = ssoLogoutTime;
     }
 
     @Override

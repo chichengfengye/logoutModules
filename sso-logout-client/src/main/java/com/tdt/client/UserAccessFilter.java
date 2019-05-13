@@ -78,7 +78,7 @@ public class UserAccessFilter implements Filter {
             }
             //有cas cookie
             else {
-                if (UserAllowedManager.getInstance().isUserAllowedByCookie(localCookie.getValue())) {
+                if (UserAllowedManager.getInstance().isAllowedUserByCookie(localCookie.getValue())) {
                     System.out.println("在白名单，放行。。。。");
                     goOn(servletRequest, servletResponse, filterChain);
                 } else {
@@ -132,7 +132,7 @@ public class UserAccessFilter implements Filter {
     }
 
     private boolean isUserInWhiteList(String cookie) {
-        return userAllowedManager.isUserAllowedByCookie(cookie);
+        return userAllowedManager.isAllowedUserByCookie(cookie);
     }
 
     /**

@@ -2,7 +2,7 @@ package com.tdt.client;
 
 import redis.clients.jedis.JedisPubSub;
 
-public class RedisPubSubListener extends JedisPubSub {
+public class PubSubListener extends JedisPubSub {
     @Override
     public void onMessage(String channel, String message) {
         /**
@@ -13,7 +13,7 @@ public class RedisPubSubListener extends JedisPubSub {
         if (message.startsWith("+")) {
             UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
             //添加到 白名单 和 Map<cookie,username>缓存
-            UserAllowedManager.getInstance().addCookieUserFromRedis(userInfo.getCookie(), userInfo.getUsername());
+            UserAllowedManager.getInstance().addCookieUserNotPub(userInfo.getCookie(), userInfo.getUsername());
 
         } else if (message.startsWith("-")) {
             String username = message.substring(1);

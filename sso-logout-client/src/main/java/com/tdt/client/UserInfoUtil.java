@@ -3,7 +3,7 @@ package com.tdt.client;
 import com.tdt.client.UserInfo;
 
 public class UserInfoUtil {
-    public static String getUserLoginMsg(String cookie, String username) {
+    public static String getUserLoginMsg(String cookie, String username, long loginTime) {
         return "+" + cookie + ":" + username;
     }
 
@@ -20,4 +20,6 @@ public class UserInfoUtil {
 
         return null;
     }
+
+//    public static UserInfo getUserInfo
 }

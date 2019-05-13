@@ -5,6 +5,7 @@ import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPubSub;
 
 public class PubSubWorker {
+    private RedisProperties redisProperties;
     private boolean flage = true;
     private boolean isSubscribing = false;
     private JedisCluster jedisCluster;
@@ -24,9 +25,9 @@ public class PubSubWorker {
         this.pubSubListenerThread = new RedisClientSubThread();
     }*/
 
-    public PubSubWorker(Jedis jedisSubscriber, Jedis jedisPublisher, JedisPubSub pubSubListener, String channel) {
-        this.jedisSubscriber = jedisSubscriber;
-        this.jedisPublisher = jedisPublisher;
+    public PubSubWorker(RedisProperties redisProperties, JedisPubSub pubSubListener, String channel) {
+        this.jedisSubscriber = new Jedis(redisProperties.getHostAndPort().getHost(),redisProperties.getHostAndPort().getPort());
+        this.jedisPublisher = new Jedis(redisProperties.getHostAndPort().getHost(),redisProperties.getHostAndPort().getPort());
         this.pubSubListener = pubSubListener;
         this.CHANNEL_NAME = channel;
         this.pubSubListenerThread = new RedisClientSubThread();

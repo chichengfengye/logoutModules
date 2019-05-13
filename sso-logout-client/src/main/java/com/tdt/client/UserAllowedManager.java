@@ -1,9 +1,7 @@
 package com.tdt.client;
 
-import redis.clients.jedis.Jedis;
-
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class UserAllowedManager {
     private static Object lock = new Object();
@@ -21,7 +19,7 @@ public class UserAllowedManager {
     /**
      * 白名单，在里面的用户是可以访问接口的
      */
-    private Set<String> whiteUserList;
+    private ConcurrentHashMap<String, CopyOnWriteArraySet<String>> whiteUserList;
 
     private UserAllowedManager() {
     }
@@ -46,30 +44,47 @@ public class UserAllowedManager {
 
     public void init() {
         cookieUserNameMap = new ConcurrentHashMap<String, String>();
-        whiteUserList = new HashSet<String>();
+        whiteUserList = new ConcurrentHashMap<String, CopyOnWriteArraySet<String>>();
 
-        Jedis jedisSubscriber = new Jedis("192.168.171.3", 7000);
-        Jedis jedisPublisher = new Jedis("192.168.171.3", 7000);
-        pubSubWorker = new PubSubWorker(jedisSubscriber,jedisPublisher,
-                new RedisPubSubListener(),
+        pubSubWorker = new PubSubWorker(new RedisProperties("redis.properties"),
+                new PubSubListener(),
                 "session_notification");
       /*  pubSubWorker = new PubSubWorker(new JedisCluster(new HostAndPort("1234", 8080)),
-                new RedisPubSubListener(),
+                new PubSubListener(),
                 "channel");*/
         pubSubWorker.subscribe();
     }
 
     public void addCookieUserAndPub(String cookie, String username) {
-        addCookieUserFromRedis(cookie, username);
+        long loginTime = System.currentTimeMillis() / 1000;
+        UserInfo userInfo = new UserInfo(cookie, username, loginTime);
+
+        addCookieUserNotPub(userInfo);
         System.out.println("begin pub to redis...");
-        pubSubWorker.publish(UserInfoUtil.getUserLoginMsg(cookie, username));
+        pubSubWorker.publish(UserInfoUtil.getUserLoginMsg(cookie, username, loginTime));
         System.out.println("pub finished...");
     }
 
-    public void addCookieUserFromRedis(String cookie, String username) {
+    public void addCookieUserNotPub(UserInfo userInfo) {
         System.out.println("add user to whiteList and cookieMap...");
-        cookieUserNameMap.put(cookie, username);
-        whiteUserList.add(username);
+
+        String username = userInfo.getUsername();
+        long loginTime = userInfo.getLoginTime();
+        String cookie = userInfo.getCookie();
+
+        cookieUserNameMap.put(cookie, username + "-loginTime=" + loginTime);
+        CopyOnWriteArraySet<String> set = whiteUserList.get(username);
+        if (set == null) {
+            synchronized (whiteUserList) {
+                set = whiteUserList.get(username);
+                if (set == null) {
+                    set = new CopyOnWriteArraySet<String>();
+                    whiteUserList.put(username, set);
+                }
+            }
+        }
+
+        set.add(cookie);
     }
 
     /**
@@ -79,7 +94,11 @@ public class UserAllowedManager {
      */
     public void removeFromWhiteList(String username) {
         System.out.println("remove user[" + username + "] from whiteList...");
-        whiteUserList.remove(username);
+        CopyOnWriteArraySet<String> set = whiteUserList.remove(username);
+        //清除緩存中的無用cookie，這裏衹是爲了釋放緩存，不存在安全問題，安全問題已經藉助whiteUserList完成了
+        for (String s : set) {
+            cookieUserNameMap.remove(s);
+        }
     }
 
     /**
@@ -88,13 +107,13 @@ public class UserAllowedManager {
      * @param cookie
      * @return
      */
-    public boolean isUserAllowedByCookie(String cookie) {
+    public boolean isAllowedUserByCookie(String cookie) {
         String username = cookieUserNameMap.get(cookie);
         if (username == null) {
             return false;
         }
 
-        boolean inWhiteList = whiteUserList.contains(username);
+        boolean inWhiteList = whiteUserList.contains(username.split("-loginTime=")[1]);
         if (!inWhiteList) {
             cookieUserNameMap.remove(cookie);
         }
