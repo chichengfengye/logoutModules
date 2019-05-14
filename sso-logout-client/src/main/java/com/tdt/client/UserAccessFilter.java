@@ -1,6 +1,8 @@
 package com.tdt.client;
 
 import com.tdt.util.HttpUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class UserAccessFilter implements Filter {
+    private Logger logger = LoggerFactory.getLogger(UserAccessFilter.class);
     private UserAccessManager userAccessManager;
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -22,7 +25,7 @@ public class UserAccessFilter implements Filter {
 
         //TODO 判断 黑名单 以及 两个cookie
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        localCookie = HttpUtil.getLocalHostCookie(request);
+        localCookie = HttpUtil.getApplicationCookie(request);
 
         /**
          * 没有localCookie，那么就是三种情况：
@@ -44,7 +47,7 @@ public class UserAccessFilter implements Filter {
                      * 故意删除local cookie的恶意用户，但不管是哪个，都
                      *  不是正常流程，所以让他重新登陆
                      */
-                    System.out.println("没有ticket, 拒绝....");
+                    logger.info("没有ticket, 拒绝....");
                     refuseRequest(servletResponse);
                 } else {
                     /**
@@ -52,7 +55,7 @@ public class UserAccessFilter implements Filter {
                      * 当前处于从cas server重定向回来的阶段，
                      * 放行
                      */
-                    System.out.println("第一次登陆，放行....");
+                    logger.info("第一次登陆，放行....");
                     goOn(servletRequest, servletResponse, filterChain);
                 }
             } else {
@@ -63,7 +66,7 @@ public class UserAccessFilter implements Filter {
                  * 这两个行为的结果都是需要用户去cas重新登陆。
                  * 所以，这里需要做的就是放行，因为后面的cas客户端的filter就有让用户去cas重新登陆的过滤逻辑
                  */
-                System.out.println("user two cookie is null,按照第一次处理，cas会重定向的，因此放行....");
+                logger.info("user two cookie is null,按照第一次处理，cas会重定向的，因此放行....");
                 goOn(servletRequest, servletResponse, filterChain);
             }
         }
@@ -75,17 +78,17 @@ public class UserAccessFilter implements Filter {
             //没有cas cookie
             if (!hasCASCookie(servletRequest)) {
                 //没有cas cookie，无效请求，拒绝
-                System.out.println("没有cas cookie，无效请求，拒绝");
+                logger.info("没有cas cookie，无效请求，拒绝");
                 refuseRequest(servletResponse);
             }
             //有cas cookie
             else {
                 if (UserAccessManager.getInstance().isAllowedUserByCookie(localCookie.getValue())) {
-                    System.out.println("在白名单，放行。。。。");
+                    logger.info("在白名单，放行。。。。");
                     servletRequest.setAttribute("accessall-username",UserAccessManager.getInstance().getUserNameByCookie(localCookie.getValue()));
                     goOn(servletRequest, servletResponse, filterChain);
                 } else {
-                    System.out.println("不在白名单，拒绝。。。。");
+                    logger.info("不在白名单，拒绝。。。。");
                     refuseRequest(servletResponse);
                 }
 
@@ -123,17 +126,7 @@ public class UserAccessFilter implements Filter {
         return userAccessManager.isAllowedUserByCookie(cookie);
     }
 
-    /**
-     * 黏贴自cas的requestWrapperFilter
-     * @param servletRequest
-     * @return
-     */
-/*    private AttributePrincipal retrievePrincipalFromSessionOrRequest(ServletRequest servletRequest) {
-      *//*  HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpSession session = request.getSession(false);
-        Assertion assertion = (Assertion) ((Assertion) (session == null ? request.getAttribute("_const_cas_assertion_") : session.getAttribute("_const_cas_assertion_")));
-        return assertion == null ? null : assertion.getPrincipal();*//*
-    }*/
+
 
     public void destroy() {
 

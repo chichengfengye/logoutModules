@@ -15,7 +15,7 @@ public class CASFilter implements Filter {
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String ticket = servletRequest.getParameter("ticket");
-        Cookie cookie = HttpUtil.getLocalHostCookie(servletRequest);
+        Cookie cookie = HttpUtil.getApplicationCookie(servletRequest);
         if (cookie == null) {
             if (ticket == null) {
                 redirectToCASServer(servletRequest, servletResponse);

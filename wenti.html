@@ -12,8 +12,8 @@
   #  答案：在從redis獲取刪除消息后，直接刪除map和white中的對應信息，這樣以來就清楚緩存了。
   #          同時，動態刪除cookie的代碼保留，用來應付并發下的一致性問題。
  2. 客户端重启后，是不是应该增加“去redis获取维护好的当前cookie的列表”逻辑呢？
- 3. properties的读取配置
- 4. jedis连接池
+  #3. properties的读取配置
+  #4. jedis连接池
  5. 整合日志
 </body>
 </html>
