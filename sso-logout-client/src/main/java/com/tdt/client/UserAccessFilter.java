@@ -1,5 +1,7 @@
 package com.tdt.client;
 
+import com.tdt.util.HttpUtil;
+
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -80,6 +82,7 @@ public class UserAccessFilter implements Filter {
             else {
                 if (UserAccessManager.getInstance().isAllowedUserByCookie(localCookie.getValue())) {
                     System.out.println("在白名单，放行。。。。");
+                    servletRequest.setAttribute("accessall-username",UserAccessManager.getInstance().getUserNameByCookie(localCookie.getValue()));
                     goOn(servletRequest, servletResponse, filterChain);
                 } else {
                     System.out.println("不在白名单，拒绝。。。。");
@@ -88,21 +91,6 @@ public class UserAccessFilter implements Filter {
 
             }
         }
-
-
-     /*   //--本地应用程序的cookie不存在 && CAS的cookie也不存在  cas一定会让他重新登录，也就是按照他是第一次请求，所以放行
-        //--就算是伪装故意删除的，也是按照第一次来访问处理，后续的cas会重定向登陆 保证安全
-        if (localCookie == null && !hasCASCookie(servletRequest)) {
-            System.out.println("cookie=null cascookie=null");
-            filterChain.doFilter(servletRequest, servletResponse);
-        } else if (localCookie != null && hasCASCookie(servletRequest) && isUserInWhiteList(localCookie.getValue())) {
-            System.out.println("cookie!=null cascookie!=null InWhiteList=true");
-            filterChain.doFilter(servletRequest, servletResponse);
-        } else {
-            System.out.println("other cookie status or not in whitelist");
-            refuseRequest(servletResponse);
-        }*/
-
 
     }
 

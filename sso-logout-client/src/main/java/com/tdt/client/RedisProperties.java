@@ -33,12 +33,16 @@ public class RedisProperties {
     public RedisProperties(String filePath) {
         properties = new Properties();
         if (filePath != null) {
-            addProperties(filePath);
+            try {
+                addProperties(filePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
 
-    public void addProperties(String filePath) {
+    public void addProperties(String filePath) throws Exception{
         try {
             URL url = this.getClass().getClassLoader().getResource("/" + filePath);
             String path = url.getPath();
@@ -51,7 +55,7 @@ public class RedisProperties {
             }
             InputStream inputStream = new BufferedInputStream(new FileInputStream(path));
             this.properties.load(inputStream);
-            System.out.println("load properties[" + filePath + "] success...");
+            System.out.println("load properties[" + filePath + "] success!");
 
 
             String[] arr = properties.getProperty("host.port").split(":");
@@ -64,7 +68,7 @@ public class RedisProperties {
             this.maxWait = properties.get("maxWait") == null ? 1000 : Integer.parseInt(properties.getProperty("maxWait"));
             if (properties.get("channelName") == null) {
                 System.out.println("channelName is not provided! you mast provide a channel name for our cas pub/sub!");
-                return;
+                throw new Exception("channelName is not provided!");
             } else {
                 this.channelName = properties.getProperty("channelName");
             }

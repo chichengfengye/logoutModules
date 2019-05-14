@@ -1,5 +1,8 @@
 package com.tdt.client;
 
+import com.tdt.dto.UserInfo;
+import com.tdt.util.UserInfoUtil;
+
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -7,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class UserAccessManager {
     private static Object lock = new Object();
     private static UserAccessManager userAccessManager;
-    private PubSubWorker pubSubWorker;
+    private ClientPubSubWorker clientPubSubWorker;
     /**
      * cookieUserNameMap 数据内容:
      * {
@@ -47,26 +50,26 @@ public class UserAccessManager {
         cookieUserNameMap = new ConcurrentHashMap<String, String>();
         whiteUserList = new ConcurrentHashMap<String, CopyOnWriteArraySet<String>>();
 
-        pubSubWorker = new PubSubWorker(new RedisProperties("redis.properties"),
+        clientPubSubWorker = new ClientPubSubWorker(new RedisProperties("redis.properties"),
                 new PubSubListener(),
                 "session_notification");
-      /*  pubSubWorker = new PubSubWorker(new JedisCluster(new HostAndPort("1234", 8080)),
+      /*  clientPubSubWorker = new ServerPubSubWorker(new JedisCluster(new HostAndPort("1234", 8080)),
                 new PubSubListener(),
                 "channel");*/
-        pubSubWorker.subscribe();
+        clientPubSubWorker.subscribe();
     }
 
     public void addCookieUserAndPub(String cookie, String username) {
         long loginTime = System.currentTimeMillis() / 1000;
         UserInfo userInfo = new UserInfo(cookie, username, loginTime);
         addCookieUserNotPub(userInfo);
-        System.out.println("begin pub to redis...");
-        pubSubWorker.publish(UserInfoUtil.getUserLoginMsg(userInfo));
-        System.out.println("pub finished...");
+        System.out.println("==> publish to redis...");
+        clientPubSubWorker.publish(UserInfoUtil.getUserLoginMsg(userInfo));
+        System.out.println("publish finished!");
     }
 
     public void addCookieUserNotPub(UserInfo userInfo) {
-        System.out.println("add user to whiteList and cookieMap...");
+        System.out.println("==> add user to whiteList and cookieMap...");
 
         String username = userInfo.getUsername();
         long loginTime = userInfo.getLoginTime();
@@ -85,6 +88,8 @@ public class UserAccessManager {
         }
 
         set.add(cookie);
+
+        System.out.println("add successfully!");
     }
 
     /**
@@ -93,7 +98,7 @@ public class UserAccessManager {
      */
     public void removeFromWhiteList(UserInfo userInfo) {
         long invalidTime = userInfo.getInvalidLoginTime();
-        System.out.println("remove user[" + userInfo.getUsername() + "] from whiteList...");
+        System.out.println("==> remove user[" + userInfo.getUsername() + "] from whiteList...");
         boolean removeUserFromList = true;
 
         /**
@@ -148,4 +153,8 @@ public class UserAccessManager {
 
     }
 
+    public String getUserNameByCookie(String cookie) {
+        String username = cookieUserNameMap.get(cookie);
+        return username;
+    }
 }

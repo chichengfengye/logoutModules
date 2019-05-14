@@ -45,7 +45,11 @@ public class CASLogin extends HttpServlet {
 
         System.out.println(" resp.sendRedirect(\"http://localhost:8081/?ticket=\"" + sessionId);
 
-        resp.sendRedirect("http://localhost:8081/userLogin?username="+ req.getParameter("username") +"&pass="+ req.getParameter("pass") +"&ticket=" + sessionId);
+        String uri = req.getRequestURI();
+
+
+
+        resp.sendRedirect("http://localhost:"+ req.getParameter("service") +"/userLogin?username="+ req.getParameter("username") +"&pass="+ req.getParameter("pass") +"&ticket=" + sessionId);
 
 //        resp.setContentType("text/html");
 //

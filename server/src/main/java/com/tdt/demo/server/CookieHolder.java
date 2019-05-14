@@ -1,6 +1,6 @@
 package com.tdt.demo.server;
 
-import com.tdt.client.UserInfoUtil;
+import com.tdt.util.UserInfoUtil;
 import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Set;
 public class CookieHolder {
     private static Map<String, String> cookieName = new HashMap<String, String>();
     private static Map<String, Set<String>> nameCookie = new HashMap<String, Set<String>>();
-    private static Jedis jedis = new Jedis("192.168.230.4",7000);
+    private static Jedis jedis = new Jedis("192.168.230.4", 7000);
     private static String CHANNEL_NAME = "session_notification";
 
     public static void publishUserOut(String username) {
@@ -27,6 +27,8 @@ public class CookieHolder {
             nameCookie.put(username, set);
         }
         set.add(cookie);
+
+        System.out.println("add cookie for user successfully! [" + cookie + "/" + username + "]");
     }
 
     public static void removeCookieByUserName(String username) {

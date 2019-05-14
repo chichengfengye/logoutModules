@@ -4,7 +4,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPubSub;
 
-public class PubSubWorker {
+public class ClientPubSubWorker {
     private RedisProperties redisProperties;
     private boolean flage = true;
     private boolean isSubscribing = false;
@@ -15,17 +15,17 @@ public class PubSubWorker {
     private String CHANNEL_NAME;
     private RedisClientSubThread pubSubListenerThread;
 
-    private PubSubWorker() {
+    private ClientPubSubWorker() {
     }
 
-/*    public PubSubWorker(JedisCluster jedisCluster , JedisPubSub pubSubListener, String channel) {
+/*    public ServerPubSubWorker(JedisCluster jedisCluster , JedisPubSub pubSubListener, String channel) {
         this.jedisCluster = jedisCluster;
         this.pubSubListener = pubSubListener;
         this.CHANNEL_NAME = channel;
         this.pubSubListenerThread = new RedisClientSubThread();
     }*/
 
-    public PubSubWorker(RedisProperties redisProperties, JedisPubSub pubSubListener, String channel) {
+    public ClientPubSubWorker(RedisProperties redisProperties, JedisPubSub pubSubListener, String channel) {
         this.jedisSubscriber = new Jedis(redisProperties.getHostAndPort().getHost(),redisProperties.getHostAndPort().getPort());
         this.jedisPublisher = new Jedis(redisProperties.getHostAndPort().getHost(),redisProperties.getHostAndPort().getPort());
         this.pubSubListener = pubSubListener;
@@ -44,11 +44,16 @@ public class PubSubWorker {
     }
 
     public String publish(String message) {
-        if (jedisCluster != null && jedisPublisher == null) {
-            jedisCluster.publish(CHANNEL_NAME, message);
-        } else if (jedisPublisher != null && jedisCluster == null) {
-            jedisPublisher.publish(CHANNEL_NAME, message);
+        try {
+            if (jedisCluster != null && jedisPublisher == null) {
+                jedisCluster.publish(CHANNEL_NAME, message);
+            } else if (jedisPublisher != null && jedisCluster == null) {
+                jedisPublisher.publish(CHANNEL_NAME, message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return message;
     }
 

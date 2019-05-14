@@ -1,5 +1,7 @@
 package com.tdt.client;
 
+import com.tdt.dto.UserInfo;
+import com.tdt.util.UserInfoUtil;
 import redis.clients.jedis.JedisPubSub;
 
 public class PubSubListener extends JedisPubSub {
@@ -9,7 +11,7 @@ public class PubSubListener extends JedisPubSub {
          * "+"号开头是添加
          * "-"号开头是删除
          */
-        System.out.println("receive message: [" + message + "] in channel [" + channel + "]");
+        System.out.println("!: receive message: [" + message + "] in channel [" + channel + "]");
         if (message.startsWith("+")) {
             UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
             //添加到 白名单 和 Map<cookie,username>缓存
@@ -19,7 +21,7 @@ public class PubSubListener extends JedisPubSub {
             UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
             UserAccessManager.getInstance().removeFromWhiteList(userInfo);
         } else {
-            System.out.println("could not notified message: "+ message);
+            System.out.println("!: could not notified message: "+ message);
         }
     }
 

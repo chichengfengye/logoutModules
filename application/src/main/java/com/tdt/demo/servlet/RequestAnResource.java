@@ -22,6 +22,7 @@ public class RequestAnResource extends HttpServlet {
         resp.setContentType("text/html");
         PrintWriter writer = resp.getWriter();
         writer.println("<html>you have got my name, my name is trigger..</html>");
+        writer.println("<html>and your name is ["+ req.getAttribute("accessall-username") +"] </html>");
         writer.flush();
         writer.close();
     }

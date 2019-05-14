@@ -1,4 +1,4 @@
-package com.tdt.client;
+package com.tdt.util;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.Cookie;

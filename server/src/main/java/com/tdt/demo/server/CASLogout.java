@@ -1,6 +1,6 @@
 package com.tdt.demo.server;
 
-import com.tdt.server.PubSubWorker;
+import com.tdt.server.ServerPubSubWorker;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,9 +31,9 @@ public class CASLogout extends HttpServlet {
             }
         }
 
-        if (username != null) {
-            PubSubWorker.getInstance().publishUserOutMsg(username);
-        }
+//        if (username != null) {
+            ServerPubSubWorker.getInstance().publishUserOutMsg(username);
+//        }
 
     }
 }

@@ -19,7 +19,7 @@
         <java.cas.client.version>3.4.1</java.cas.client.version>
     </properties>
     <dependencies>
-        <dependency>
+      <!--  <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.1</version>
@@ -39,7 +39,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.5.1</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -123,35 +123,6 @@
     <build>
         <finalName>app</finalName>
         <plugins>
-           <!-- <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>-->
-            <!--			<plugin>
-                            <groupId>org.eclipse.jetty</groupId>
-                            <artifactId>jetty-maven-plugin</artifactId>
-                            <configuration>
-                                <httpConnector>
-                                    <port>8081</port>
-                                </httpConnector>
-                                <stopPort>8881</stopPort>
-                                <stopKey>QUIT</stopKey>
-                                <scanIntervalSeconds>1</scanIntervalSeconds>
-                                <webApp>
-                                    <contextPath>/</contextPath>
-                                    <defaultsDescriptor>src/main/resources/webdefault.xml</defaultsDescriptor>
-                                </webApp>
-                            </configuration>
-                        </plugin>-->
-           <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
-            </plugin>-->
         </plugins>
     </build>
 </project>

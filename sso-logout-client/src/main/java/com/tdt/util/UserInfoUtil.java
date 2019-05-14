@@ -1,6 +1,7 @@
-package com.tdt.client;
+package com.tdt.util;
 
 import com.alibaba.fastjson.JSON;
+import com.tdt.dto.UserInfo;
 
 public class UserInfoUtil {
     public static String getUserOutMsg(String username) {
