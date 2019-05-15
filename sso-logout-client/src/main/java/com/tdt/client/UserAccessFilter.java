@@ -1,6 +1,6 @@
 package com.tdt.client;
 
-import com.tdt.util.HttpUtil;
+import com.tdt.util.UserCookieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class UserAccessFilter implements Filter {
 
         //TODO 判断 黑名单 以及 两个cookie
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        localCookie = HttpUtil.getApplicationCookie(request);
+        localCookie = UserCookieUtil.getApplicationCookie(request);
 
         /**
          * 没有localCookie，那么就是三种情况：
@@ -35,16 +35,20 @@ public class UserAccessFilter implements Filter {
          */
         if (localCookie == null) {
             /**
-             * 有cas cookie，那么是上面的两种情况：
+             * 有cas cookie，那么是上面的三种情况：
              * A. 第一次登陆成功后的重定向
-             * B. 用户故意删除local cookie，但是保留cas cookie
+             * B. 用户已经登陆其它服务，只是第一次访问本服务
+             * C. 用户故意删除local cookie，但是保留cas cookie
              */
             if (hasCASCookie(servletRequest)) {
                 String ticket = getTicket(servletRequest);
                 if (ticket == null) {
                     /**
-                     * 没有ticket，要么是用户故意删除ticket，要么就是
-                     * 故意删除local cookie的恶意用户，但不管是哪个，都
+                     * 没有ticket，那么有以下两个方面：
+                     * 1. 用户故意删除ticket，
+                     * 2. 用户已经登陆了其它服务，第一次来访问本服务
+                     * 3. 故意删除local cookie和ticket
+                     * 但不管是哪个，都
                      *  不是正常流程，所以让他重新登陆
                      */
                     logger.info("没有ticket, 拒绝....");
@@ -60,10 +64,10 @@ public class UserAccessFilter implements Filter {
                 }
             } else {
                 /**
-                 * 没有cas cookie，那就有可能是两种情况：
-                 * A.用户第一次登陆 或者
+                 * 没有cas cookie，那就有可能是三种情况：
+                 * A.用户第一次登陆本服务（包括已经登陆其它服务,只是第一次请求本服务）
                  * B.用户故意删除两个cookie才会到这里
-                 * 这两个行为的结果都是需要用户去cas重新登陆。
+                 * 这两个行为的结果都是需要用户去cas重新登陆（或者去cas server 做登陆认证）。
                  * 所以，这里需要做的就是放行，因为后面的cas客户端的filter就有让用户去cas重新登陆的过滤逻辑
                  */
                 logger.info("user two cookie is null,按照第一次处理，cas会重定向的，因此放行....");
@@ -118,7 +122,7 @@ public class UserAccessFilter implements Filter {
     }
 
     private boolean hasCASCookie(ServletRequest servletRequest) {
-        return HttpUtil.hasCASCookie(servletRequest);
+        return UserCookieUtil.hasCASCookie(servletRequest);
     }
 
     private boolean isUserInWhiteList(String cookie) {

@@ -1,6 +1,6 @@
 package com.tdt.demo.filter;
 
-import com.tdt.util.HttpUtil;
+import com.tdt.util.UserCookieUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -15,7 +15,7 @@ public class CASFilter implements Filter {
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String ticket = servletRequest.getParameter("ticket");
-        Cookie cookie = HttpUtil.getApplicationCookie(servletRequest);
+        Cookie cookie = UserCookieUtil.getApplicationCookie(servletRequest);
         if (cookie == null) {
             if (ticket == null) {
                 redirectToCASServer(servletRequest, servletResponse);

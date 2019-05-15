@@ -8,7 +8,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-public class HttpUtil {
+public class UserCookieUtil {
     public static Cookie getApplicationCookie(ServletRequest servletRequest) {
         return getCookieByKey("JSESSIONID", servletRequest);
     }

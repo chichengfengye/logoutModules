@@ -26,7 +26,7 @@ public class PubSubListener extends JedisPubSub {
             UserInfo userInfo = UserInfoUtil.getUserInfoFromMessage(message.substring(1));
             UserAccessManager.getInstance().removeFromWhiteList(userInfo);
         } else {
-            logger.info("!: could not notified message: {} ", message);
+            logger.info("!: could not recognize message: {} ", message);
         }
     }
 

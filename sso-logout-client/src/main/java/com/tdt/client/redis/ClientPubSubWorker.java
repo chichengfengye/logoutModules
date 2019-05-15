@@ -46,7 +46,6 @@ public class ClientPubSubWorker {
             isSubscribing = true;
             pubSubListenerThread.start();
             logger.info("==> subscriber subscribe channel[ {} ] successfully!", CHANNEL_NAME);
-            System.out.println();
         } else {
             logger.info("!: subscriber has subscribed a channel before....");
         }
@@ -75,14 +74,17 @@ public class ClientPubSubWorker {
     }
 
     private class RedisClientSubThread extends Thread {
+        private int maxException = 10;
+
         @Override
         public void run() {
-            while (true) {
+            while (maxException <= 10) {
                 try {
                     if (jedisCluster != null && jedisSubscriber == null) {
                         jedisCluster.subscribe(pubSubListener, CHANNEL_NAME);
                     } else if (jedisSubscriber != null && jedisCluster == null) {
                         jedisSubscriber.subscribe(pubSubListener, CHANNEL_NAME);
+                        maxException++;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
