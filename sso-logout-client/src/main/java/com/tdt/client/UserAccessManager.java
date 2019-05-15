@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -100,7 +101,6 @@ public class UserAccessManager {
 
     /**
      * 移除用户从白名单，意思就是他无权访问接口
-     *
      */
     public void removeFromWhiteList(UserInfo userInfo) {
         long invalidTime = userInfo.getInvalidLoginTime();
@@ -116,7 +116,7 @@ public class UserAccessManager {
         //清除緩存中的無用cookie，這裏衹是爲了釋放緩存，不存在安全問題，安全問題已經藉助whiteUserList完成了
         Iterator iterator = set.iterator();
         while (iterator.hasNext()) {
-            String s = (String)iterator.next();
+            String s = (String) iterator.next();
             String username = cookieUserNameMap.get(s);
             if (username == null) {
                 cookieUserNameMap.remove(s);
@@ -157,6 +157,16 @@ public class UserAccessManager {
         }
         return inWhiteList;
 
+    }
+
+    /**
+     * 依據用戶名判斷用戶是否可以访问接口
+     *
+     * @param username
+     * @return
+     */
+    public boolean isAllowedUserByUserName(String username) {
+        return whiteUserList.containsKey(username);
     }
 
     public String getUserNameByCookie(String cookie) {

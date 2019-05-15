@@ -34,7 +34,7 @@ public class UserCookieUtil {
         return assertion == null ? null : assertion.getPrincipal();
     }
 
-    private static Cookie getCookieByKey(String key, ServletRequest servletRequest) {
+    public static Cookie getCookieByKey(String key, ServletRequest servletRequest) {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length >0) {
