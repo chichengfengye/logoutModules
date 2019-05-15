@@ -118,8 +118,7 @@ public class UserAccessFilter implements Filter {
     }
 
     private boolean hasCASCookie(ServletRequest servletRequest) {
-        return HttpUtil.getCASCookie(servletRequest) != null;
-//        return retrievePrincipalFromSessionOrRequest(servletRequest) != null;
+        return HttpUtil.hasCASCookie(servletRequest);
     }
 
     private boolean isUserInWhiteList(String cookie) {

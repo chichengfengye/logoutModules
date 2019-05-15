@@ -10,18 +10,24 @@ import javax.servlet.http.HttpSession;
 
 public class HttpUtil {
     public static Cookie getApplicationCookie(ServletRequest servletRequest) {
-        return getCookieByKey("application-cookie", servletRequest);
+        return getCookieByKey("JSESSIONID", servletRequest);
     }
 
-    public static Cookie getCASCookie(ServletRequest servletRequest) {
-        return getCookieByKey("server-cookie", servletRequest);
+    public static AttributePrincipal getCASCookie(ServletRequest servletRequest) {
+        return retrievePrincipalFromSessionOrRequest(servletRequest);
+        //        return getCookieByKey("server-cookie", servletRequest);
+    }
+
+    public static boolean hasCASCookie(ServletRequest servletRequest) {
+        return retrievePrincipalFromSessionOrRequest(servletRequest) != null;
+//                return getCookieByKey("server-cookie", servletRequest) != null;
     }
     /**
      * 黏贴自cas的requestWrapperFilter
      * @param servletRequest
      * @return
      */
-    private AttributePrincipal retrievePrincipalFromSessionOrRequest(ServletRequest servletRequest) {
+    private static AttributePrincipal retrievePrincipalFromSessionOrRequest(ServletRequest servletRequest) {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpSession session = request.getSession(false);
         Assertion assertion = (Assertion) ((Assertion) (session == null ? request.getAttribute("_const_cas_assertion_") : session.getAttribute("_const_cas_assertion_")));

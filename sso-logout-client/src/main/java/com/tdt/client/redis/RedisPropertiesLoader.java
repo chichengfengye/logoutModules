@@ -47,16 +47,18 @@ public class RedisPropertiesLoader {
 
     public void addProperties(String filePath) throws Exception{
         try {
-            URL url = this.getClass().getClassLoader().getResource("/" + filePath);
-            String path = url.getPath();
-            if (path != null) {
-                path = path.replace("%20", " ");
-                logger.info("find redis properties in path : [ {} ]", url.getPath());
-            } else {
-                logger.info("redis properties not find in path : [ {} ]", filePath);
-                return;
-            }
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(path));
+//            URL url = this.getClass().getClassLoader().getResource("/" + filePath);
+//            URL url = this.getClass().getResourceAsStream("/" + filePath);
+//            String path = url.getPath();
+//            if (path != null) {
+//                path = path.replace("%20", " ");
+//                logger.info("find redis properties in path : [ {} ]", url.getPath());
+//            } else {
+//                logger.info("redis properties not find in path : [ {} ]", filePath);
+//                return;
+//            }
+//            InputStream inputStream = new BufferedInputStream(new FileInputStream(path));
+            InputStream inputStream = this.getClass().getResourceAsStream("/" + filePath);
             this.properties.load(inputStream);
             logger.info("load properties[{}] success!", filePath);
 
